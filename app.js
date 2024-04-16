@@ -9,7 +9,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use("/projects", router);
+app.use("/", router);
 
 try {
     await db.authenticate();
@@ -18,9 +18,9 @@ try {
     console.log(`Error: ${error}`);
 }
 
-/*app.get("/", (req, res) =>{
+app.get("/", (req, res) =>{
     res.send("Hola Mundo");
-})*/
+})
 
 app.listen(8000, ()=>{
     console.log("Server UP running in http://localhost:8000/")
