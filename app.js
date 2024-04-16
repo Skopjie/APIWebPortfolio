@@ -1,18 +1,19 @@
 import express from "express";
 import cors from "cors";
 
-import db from "./database/db.js";
-import router from "./routes/routes.js";
+//import db from "./database/db.js";
+//import router from "./routes/routes.js";
 
 
 const app = express();
+const PORT = process.env.PORT || 3977;
 
 app.use(cors());
 app.use(express.json());
-app.use("/", router);
+//app.use("/", router);
 
 try {
-    await db.authenticate();
+    //await db.authenticate();
     console.log("Conexion Exitosa");
 } catch (error) {
     console.log(`Error: ${error}`);
@@ -22,6 +23,6 @@ app.get("/", (req, res) =>{
     res.send("Hola Mundo");
 })
 
-app.listen(8000, ()=>{
-    console.log("Server UP running in http://localhost:8000/")
+app.listen(PORT, ()=>{
+    console.log("Server UP running in http://localhost:"+PORT+"/")
 })
