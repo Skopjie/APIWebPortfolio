@@ -1,95 +1,203 @@
 import { Op } from 'sequelize';
+import db from "../database/db.js";
+import { QueryTypes } from "sequelize";
 
 import projectsModel from "../models/portfolioModel.js";
 import categoryModel from "../models/categoriesModel.js";
-import workExperinceModel from "../models/experienceWorkModel.js";
 import technologyModel from "../models/technologiesModel.js";
 import technologyCategoryModel from "../models/technologiesCategoriesModel.js";
-import educationModel from "../models/educationModel.js";
 import projectOutstandingModel from "../models/projectOutstandingMdel.js";
 
 export const getAllProjects = async (req, res) => {
     try {
-        const projectsWithTags = [];
-        const projectData = await projectsModel.findAll();
+        const projectWithTechNames = await db.query(`
+        SELECT p.* , tt.name AS tagName
+        FROM projects p
+        JOIN projects_to_tech_tags ptt ON p.id = ptt.idProject
+        JOIN techs_tags tt ON ptt.idTech = tt.id
+        `, {
+        type: QueryTypes.SELECT
+      });
 
-        for (const project of projectData) {
-            let projectCopy = project.toJSON(); // Convertir a JSON al principio
-
-            if (project.tags != null) {
-                const projectTags = JSON.parse(project.tags);
-
-                const techTags = await technologyModel.findAll({
-                    where: { id: { [Op.in]: projectTags } },
-                });
-
-                const tagMap = techTags.reduce((acc, techTag) => {
-                    acc[techTag.id] = techTag.name;
-                    return acc;
-                }, {});
-
-                const tags = projectTags.map(tagId => tagMap[tagId]);
-                projectCopy = { ...projectCopy, tags }; 
-            } 
-
-            if (project.idCategory != null) {
-                const projecCategory = JSON.parse(project.idCategory);
-
-                const idCategory = await categoryModel.findAll({
-                    where: { id: { [Op.in]: projecCategory } },
-                });
-                
-                projectCopy = { ...projectCopy, idCategory }; 
-            } 
-
-            projectsWithTags.push(projectCopy);
-        }
-
-        res.json(projectsWithTags);
-    } catch (error) {
-        res.json({ message: error.message });
-    }
-}
-
-
-
-export const getProject = async (req, res)=>{
-    try {
-        const projectData  = await projectsModel.findAll({
-            where:{
-            id:req.params.id
-            }
-        });
-
-        // Obtener los IDs de los tags
-        const tagIds = projectData.reduce((acc, project) => {
-            return acc.concat(JSON.parse(project.tags));
-        }, []);
-
-        // Obtener los datos de los tags
-        const techTags = await technologyModel.findAll({
-            where: { id: { [Op.in]: tagIds } },
-        });
-
-        // Crear un mapa de ID de tag a nombre de tag
-        const tagMap = techTags.reduce((acc, techTag) => {
-            acc[techTag.id] = techTag.name;
-            return acc;
-        }, {});
-
-        // Sustituir los IDs de tag por sus nombres en cada proyecto
-        const projectsWithTags = projectData.map(project => {
-            const tags = JSON.parse(project.tags).map(tagId => tagMap[tagId]);
-            return { ...project.toJSON(), tags };
-        });
-
-        res.json(projectsWithTags);
+      const result = {};
+      projectWithTechNames.forEach(project => {
+          if (!result[project.id]) {
+              result[project.id] = {
+                  name: project.name,
+                  resume: project.resume,
+                  description: project.description,
+                  URLImage: project.URLImage,
+                  githubUrl	: project.githubUrl,
+                  moreInfoUrl: project.moreInfoUrl,
+                  tags: []
+              };
+          }
+          if (project.tagName) {
+              result[project.id].tags.push(project.tagName);
+          }
+      });
+      
+      res.json(Object.values(result));
     } catch (error) {
         res.json({message: error.message});
     }
 }
 
-export const createProject = async (req, res)=>{
+export const getProject = async (req, res)=>{
+    try {
+        const projectWithTechNames = await db.query(`
+        SELECT p.* , tt.name AS tagName
+        FROM projects p
+        JOIN projects_to_tech_tags ptt ON p.id = ptt.idProject
+        JOIN techs_tags tt ON ptt.idTech = tt.id
+        WHERE p.id = :projectId;
+        `, {
+        type: QueryTypes.SELECT,
+        replacements: { projectId : req.params.id}
+      });
+
+      const result = {};
+      projectWithTechNames.forEach(project => {
+          if (!result[project.id]) {
+              result[project.id] = {
+                  name: project.name,
+                  resume: project.resume,
+                  description: project.description,
+                  URLImage: project.URLImage,
+                  githubUrl	: project.githubUrl,
+                  moreInfoUrl: project.moreInfoUrl,
+                  tags: []
+              };
+          }
+          if (project.tagName) {
+            result[project.id].tags.push(project.tagName);
+          }
+      });
+      
+      res.json(Object.values(result));
+    } catch (error) {
+        res.json({message: error.message});
+    }
+}
+
+export const getProjectsOutstanding = async (req, res) => {
+    try {
+
+        const projectsOutstandings = await db.query(`
+            SELECT idProject
+            FROM projects_outstandings;
+            `, {
+            type: QueryTypes.SELECT
+        });
+
+        const projectsOutstandingsId = [];
+        projectsOutstandings.forEach(project => {
+            projectsOutstandingsId.push(project.idProject);
+        });
+
+        const projectWithTechNames = await db.query(`
+        SELECT p.* , tt.name AS tagName
+        FROM projects p
+        JOIN projects_to_tech_tags ptt ON p.id = ptt.idProject
+        JOIN techs_tags tt ON ptt.idTech = tt.id
+        WHERE p.id IN(:projectId);
+        `, {
+        type: QueryTypes.SELECT,
+        replacements: { projectId : projectsOutstandingsId}
+      });
+
+      const result = {};
+      projectWithTechNames.forEach(project => {
+          if (!result[project.id]) {
+              result[project.id] = {
+                  name: project.name,
+                  resume: project.resume,
+                  description: project.description,
+                  URLImage: project.URLImage,
+                  githubUrl	: project.githubUrl,
+                  moreInfoUrl: project.moreInfoUrl,
+                  tags: []
+              };
+          }
+          if (project.tagName) {
+            result[project.id].tags.push(project.tagName);
+          }
+      });
+      
+      res.json(Object.values(result));
+    } catch (error) {
+        res.json({message: error.message});
+    }
+};
+
+export const getProjectCategories = async (req, res)=>{
+    try {
+        const categories = await db.query('SELECT * FROM categories_project', { type: QueryTypes.SELECT });
+        res.json(categories);
+    } catch (error) {
+        res.json({message: error.message});
+    }
+}
+
+export const getTechnologies = async (req, res) => {
+    try {
+        const techCategories = await db.query(`
+            SELECT 
+                tc.id AS categoryId, 
+                tc.name AS categoryName,
+                tt.id AS techId,
+                tt.name AS techName
+            FROM techs_categories AS tc
+            LEFT JOIN techs_tags AS tt ON tc.id = tt.idCategoryTechnology
+        `, {
+            type: QueryTypes.SELECT
+        });
+        
+        const result = {};
+        techCategories.forEach(category => {
+            if (!result[category.categoryId]) {
+                result[category.categoryId] = {
+                    categoryId: category.categoryId,
+                    categoryName: category.categoryName,
+                    techs: []
+                };
+            }
+            if (category.techId) {
+                result[category.categoryId].techs.push({
+                    techId: category.techId,
+                    techName: category.techName
+                });
+            }
+        });
+        
+        res.json(Object.values(result));
+    } catch (error) {
+        res.json({ message: error.message });
+    }
+}
+
+export const getWorkExperiece = async (req, res)=>{
+    try {
+        const workExperience = await db.query('SELECT * FROM about_work_experiences', { type: QueryTypes.SELECT });
+        res.json(workExperience);
+    } catch (error) {
+        res.json({message: error.message});
+    }
+}
+
+export const getEducation = async (req, res)=>{
+    try {
+        const education = await db.query('SELECT * FROM about_education_experiences', { type: QueryTypes.SELECT });
+        res.json(education);
+    } catch (error) {
+        res.json({message: error.message});
+    }
+}
+
+
+
+/*
+ export const createProject = async (req, res)=>{
     try {
         await projectsModel.create(req.body);
         res.json({"message":"Registro creado"});
@@ -120,98 +228,4 @@ export const deleteProject = async (req, res)=>{
         res.json({message: error.message});
     }
 }
-
-
-
-export const getProjectCategories = async (req, res)=>{
-    try {
-        const categories = await categoryModel.findAll();
-        res.json(categories);
-    } catch (error) {
-        res.json({message: error.message});
-    }
-}
-
-export const getWorkExperiece = async (req, res)=>{
-    try {
-        const workExperience = await workExperinceModel.findAll();
-        res.json(workExperience);
-    } catch (error) {
-        res.json({message: error.message});
-    }
-}
-
-export const getTechnologies = async (req, res)=>{
-    try {
-        const techs = [];
-
-        const technologiesCategories = await technologyCategoryModel.findAll();
-        for (const technologyCategory of technologiesCategories) {
-            const techTags = await technologyModel.findAll({
-                where: { idCategoryTechnology: technologyCategory.id },
-            });
-
-            techs.push(
-                {
-                    "name":technologyCategory.name,
-                    "techs": techTags,
-                }
-            );
-        }
-
-        res.json(techs);
-    } catch (error) {
-        res.json({message: error.message});
-    }
-}
-
-export const getTechnologiesCategory = async (req, res)=>{
-    try {
-        const technologies = await technologyCategoryModel.findAll();
-        res.json(technologies);
-    } catch (error) {
-        res.json({message: error.message});
-    }
-}
-
-export const getEducation = async (req, res)=>{
-    try {
-        const education = await educationModel.findAll();
-        res.json(education);
-    } catch (error) {
-        res.json({message: error.message});
-    }
-}
-
-export const getProjectsOutstanding = async (req, res) => {
-    try {
-        const projectsOutstanding = await projectOutstandingModel.findAll();
-        const idProjects = projectsOutstanding.map(project => project.idProject);
-
-        const projectData = await projectsModel.findAll({
-            where: { id: idProjects },
-        });
-
-         const tagIds = projectData.reduce((acc, project) => {
-            return acc.concat(JSON.parse(project.tags));
-        }, []);
-
-        const techTags = await technologyModel.findAll({
-            where: { id: { [Op.in]: tagIds } },
-        });
-
-        const tagMap = techTags.reduce((acc, techTag) => {
-            acc[techTag.id] = techTag.name;
-            return acc;
-        }, {});
-
-        const projectsWithTags = projectData.map(project => {
-            const tags = JSON.parse(project.tags).map(tagId => tagMap[tagId]);
-            return { ...project.toJSON(), tags };
-        });
-
-        res.json(projectsWithTags);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
+ */
