@@ -10,11 +10,11 @@ router.put("/:id", updateProject);
 router.delete("/:id", deleteProject);*/
 
 
-router.get("/category/all", getProjectCategories);
-router.get("/projectsOutstanding/all", getProjectsOutstanding);
-router.get("/technologies/all", getTechnologies);
+router.get("/category", getProjectCategories);
+router.get("/projectsOutstanding", getProjectsOutstanding);
 
-router.get("/aboutWorkExperience/all", getWorkExperiece);
-router.get("/aboutEducationExperience/all", getEducation);
+router.get("/about/technologies", getTechnologies);
+router.get("/about/WorkExperience", getWorkExperiece);
+router.get("/about/EducationExperience", getEducation);
 
 export default router;
