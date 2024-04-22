@@ -23,6 +23,7 @@ export const getAllProjects = async (req, res) => {
       projectWithTechNames.forEach(project => {
           if (!result[project.id]) {
               result[project.id] = {
+                  id: project.id,
                   name: project.name,
                   resume: project.resume,
                   description: project.description,
@@ -60,6 +61,7 @@ export const getProject = async (req, res)=>{
       projectWithTechNames.forEach(project => {
           if (!result[project.id]) {
               result[project.id] = {
+                  id: project.id,
                   name: project.name,
                   resume: project.resume,
                   description: project.description,
@@ -110,6 +112,7 @@ export const getProjectsOutstanding = async (req, res) => {
       projectWithTechNames.forEach(project => {
           if (!result[project.id]) {
               result[project.id] = {
+                  id: project.id,
                   name: project.name,
                   resume: project.resume,
                   description: project.description,
@@ -147,6 +150,7 @@ export const getTechnologies = async (req, res) => {
                 tc.name AS categoryName,
                 tt.id AS techId,
                 tt.name AS techName
+                tt.iconURL AS iconURL
             FROM techs_categories AS tc
             LEFT JOIN techs_tags AS tt ON tc.id = tt.idCategoryTechnology
         `, {
