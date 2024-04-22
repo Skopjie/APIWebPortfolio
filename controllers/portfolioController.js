@@ -169,7 +169,8 @@ export const getTechnologies = async (req, res) => {
             if (category.techId) {
                 result[category.categoryId].techs.push({
                     techId: category.techId,
-                    techName: category.techName
+                    techName: category.techName,
+                    iconURL: category.iconURL
                 });
             }
         });
