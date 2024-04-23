@@ -149,7 +149,7 @@ export const getTechnologies = async (req, res) => {
                 tc.id AS categoryId, 
                 tc.name AS categoryName,
                 tt.id AS techId,
-                tt.name AS techName
+                tt.name AS techName,
                 tt.iconURL AS iconURL
             FROM techs_categories AS tc
             LEFT JOIN techs_tags AS tt ON tc.id = tt.idCategoryTechnology
