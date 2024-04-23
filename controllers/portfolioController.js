@@ -11,11 +11,13 @@ import projectOutstandingModel from "../models/projectOutstandingMdel.js";
 export const getAllProjects = async (req, res) => {
     try {
         const projectWithTechNames = await db.query(`
-        SELECT p.* , tt.name AS tagName
+        SELECT p.* , tt.name AS tagName, cp.name AS categoryName, cp.id AS categoryId
         FROM projects p
         JOIN projects_to_tech_tags ptt ON p.id = ptt.idProject
         JOIN techs_tags tt ON ptt.idTech = tt.id
-        `, {
+        JOIN projects_to_categories pc ON p.id = pc.idProject
+        JOIN categories_project cp ON pc.idCategory = cp.id
+      `, {
         type: QueryTypes.SELECT
       });
 
@@ -30,6 +32,7 @@ export const getAllProjects = async (req, res) => {
                   URLImage: project.URLImage,
                   githubUrl	: project.githubUrl,
                   moreInfoUrl: project.moreInfoUrl,
+                  idCategory: {id: project.categoryId, name: project.categoryName},
                   tags: []
               };
           }
@@ -47,10 +50,12 @@ export const getAllProjects = async (req, res) => {
 export const getProject = async (req, res)=>{
     try {
         const projectWithTechNames = await db.query(`
-        SELECT p.* , tt.name AS tagName
+        SELECT p.* , tt.name AS tagName, cp.name AS categoryName, cp.id AS categoryId
         FROM projects p
         JOIN projects_to_tech_tags ptt ON p.id = ptt.idProject
         JOIN techs_tags tt ON ptt.idTech = tt.id
+        JOIN projects_to_categories pc ON p.id = pc.idProject
+        JOIN categories_project cp ON pc.idCategory = cp.id
         WHERE p.id = :projectId;
         `, {
         type: QueryTypes.SELECT,
@@ -68,6 +73,7 @@ export const getProject = async (req, res)=>{
                   URLImage: project.URLImage,
                   githubUrl	: project.githubUrl,
                   moreInfoUrl: project.moreInfoUrl,
+                  idCategory: {id: project.categoryId, name: project.categoryName},
                   tags: []
               };
           }
