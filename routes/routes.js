@@ -1,5 +1,5 @@
 import express from "express";
-import { getAllProjects, getProject, /*createProject, updateProject, deleteProject,*/ getProjectCategories, getWorkExperiece, getTechnologies, getEducation, getProjectsOutstanding} from "../controllers/portfolioController.js";
+import { getAllProjects, getProject, /*createProject, updateProject, deleteProject,*/ getProjectCategories, getWorkExperiece, getTechnologies, getEducation, getProjectsOutstanding, getSoftSkills, getStats} from "../controllers/portfolioController.js";
 
 const router = express.Router();
 
@@ -16,5 +16,7 @@ router.get("/projectsOutstanding", getProjectsOutstanding);
 router.get("/about/technologies", getTechnologies);
 router.get("/about/WorkExperience", getWorkExperiece);
 router.get("/about/EducationExperience", getEducation);
+router.get("/about/SoftSkills", getSoftSkills);
+router.get("/about/Stats", getStats);
 
 export default router;

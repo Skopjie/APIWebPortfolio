@@ -29,6 +29,7 @@ export const getAllProjects = async (req, res) => {
                   name: project.name,
                   resume: project.resume,
                   description: project.description,
+                  year: project.year,
                   URLImage: project.URLImage,
                   githubUrl	: project.githubUrl,
                   moreInfoUrl: project.moreInfoUrl,
@@ -70,6 +71,7 @@ export const getProject = async (req, res)=>{
                   name: project.name,
                   resume: project.resume,
                   description: project.description,
+                  year: project.year,
                   URLImage: project.URLImage,
                   githubUrl	: project.githubUrl,
                   moreInfoUrl: project.moreInfoUrl,
@@ -122,6 +124,7 @@ export const getProjectsOutstanding = async (req, res) => {
                   name: project.name,
                   resume: project.resume,
                   description: project.description,
+                  year: project.year,
                   URLImage: project.URLImage,
                   githubUrl	: project.githubUrl,
                   moreInfoUrl: project.moreInfoUrl,
@@ -200,6 +203,24 @@ export const getEducation = async (req, res)=>{
     try {
         const education = await db.query('SELECT * FROM about_education_experiences', { type: QueryTypes.SELECT });
         res.json(education);
+    } catch (error) {
+        res.json({message: error.message});
+    }
+}
+
+export const getSoftSkills = async (req, res)=>{
+    try {
+        const softSkills = await db.query('SELECT * FROM about_soft_skills', { type: QueryTypes.SELECT });
+        res.json(softSkills);
+    } catch (error) {
+        res.json({message: error.message});
+    }
+}
+
+export const getStats = async (req, res)=>{
+    try {
+        const stats = await db.query('SELECT * FROM about_stats', { type: QueryTypes.SELECT });
+        res.json(stats);
     } catch (error) {
         res.json({message: error.message});
     }
