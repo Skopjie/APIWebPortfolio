@@ -11,7 +11,7 @@ import projectOutstandingModel from "../models/projectOutstandingMdel.js";
 export const getAllProjects = async (req, res) => {
     try {
         const projectWithTechNames = await db.query(`
-        SELECT p.* , tt.name AS tagName, cp.name AS categoryName, cp.id AS categoryId
+        SELECT p.* , tt.name AS tagName, cp.name AS categoryName, cp.id AS categoryId, p.createdAt, p.updatedAt
         FROM projects p
         JOIN projects_to_tech_tags ptt ON p.id = ptt.idProject
         JOIN techs_tags tt ON ptt.idTech = tt.id
@@ -33,6 +33,8 @@ export const getAllProjects = async (req, res) => {
                   URLImage: project.URLImage,
                   githubUrl	: project.githubUrl,
                   moreInfoUrl: project.moreInfoUrl,
+                  createdAt: project.createdAt,
+                  updatedAt: project.updatedAt,
                   idCategory: {id: project.categoryId, name: project.categoryName},
                   tags: []
               };
@@ -75,6 +77,8 @@ export const getProject = async (req, res)=>{
                   URLImage: project.URLImage,
                   githubUrl	: project.githubUrl,
                   moreInfoUrl: project.moreInfoUrl,
+                  createdAt: project.createdAt,
+                  updatedAt: project.updatedAt,
                   idCategory: {id: project.categoryId, name: project.categoryName},
                   tags: []
               };
@@ -126,6 +130,8 @@ export const getProjectsOutstanding = async (req, res) => {
                   description: project.description,
                   year: project.year,
                   URLImage: project.URLImage,
+                  createdAt: project.createdAt,
+                  updatedAt: project.updatedAt,
                   githubUrl	: project.githubUrl,
                   moreInfoUrl: project.moreInfoUrl,
                   tags: []
