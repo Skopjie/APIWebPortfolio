@@ -6,7 +6,7 @@ const db = new Sequelize("webportfolio", "root","",{
 })
 */
 
-const db = new Sequelize("u145269151_webportfolio", "u145269151_na","uXkTDX6@",{
+const db = new Sequelize(process.env.DDBB_TABLE, process.env.DDBB_USER, process.env.DDBB_PASS,{
     host:"srv1124.hstgr.io",
     dialect: "mysql"
 })
